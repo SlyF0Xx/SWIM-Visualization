@@ -29,6 +29,16 @@ Iter select_randomly(Iter start, Iter end) {
     return select_randomly(start, end, gen);
 }
 
+template<typename Clock, typename Duration>
+std::ostream &operator<<(std::ostream &stream,
+                         const std::chrono::time_point<Clock, Duration> &time_point)
+{
+    const time_t time = Clock::to_time_t(time_point);
+    struct tm tm;
+    localtime_r(&time, &tm);
+    return stream << std::put_time(&tm, "%c"); // Print standard date&time
+}
+
 } // unnamed namespace
 
 std::chrono::seconds Member::s_period = std::chrono::seconds(7);
@@ -40,10 +50,26 @@ Member::Member(int id, IMessageEnvironment & message_env, ITimer & timer) :
     m_timer(timer)
 {}
 
+void Member::apply_removed_members(const BaseMessage & message)
+{
+    for (auto removed_id : message.members_to_delete) {
+        if (m_members.count(removed_id) != 0) {
+            std::ostringstream oss;
+            oss << std::chrono::system_clock::now() << std::to_string(m_id) << " received from" << message.from << ", that " << removed_id << " is dead";
+            m_logs.push_back(oss.str());
+        }
+        m_removed_members.push_back(removed_id);
+        m_members.erase(removed_id);
+    }
+}
+
 void Member::handle_ping(const PingMessage & msg)
 {
     if (m_alive) {
+        apply_removed_members(msg);
+
         AckMessage ack{m_id, msg.from, msg.target};
+        ack.members_to_delete = m_removed_members;
         m_message_env.register_message(ack);
     }
 
@@ -53,8 +79,11 @@ void Member::handle_ping(const PingMessage & msg)
 void Member::handle_ack(const AckMessage & msg)
 {
     if (m_alive) {
+        apply_removed_members(msg);
+
         if (msg.target) {
             AckMessage ack{m_id, *msg.target};
+            ack.members_to_delete = m_removed_members;
             m_message_env.register_message(ack);
         } else {
             if (m_poll_target) {
@@ -71,7 +100,10 @@ void Member::handle_ack(const AckMessage & msg)
 void Member::handle_ping_req(const PingReqMessage & msg)
 {
     if (m_alive) {
+        apply_removed_members(msg);
+
         PingMessage ping{m_id, msg.target, msg.from};
+        ping.members_to_delete = m_removed_members;
         m_message_env.register_message(ping);
     }
 
@@ -83,16 +115,6 @@ void Member::run()
     m_timer.schedule_periodically([this](){
         tick();
     });
-}
-
-template<typename Clock, typename Duration>
-std::ostream &operator<<(std::ostream &stream,
-                         const std::chrono::time_point<Clock, Duration> &time_point)
-{
-    const time_t time = Clock::to_time_t(time_point);
-    struct tm tm;
-    localtime_r(&time, &tm);
-    return stream << std::put_time(&tm, "%c"); // Print standard date&time
 }
 
 void Member::tick()
@@ -112,6 +134,7 @@ void Member::tick()
                 oss << now <<  std::to_string(m_id) << " find, that " << *m_poll_target << " is dead";
                 m_logs.push_back(oss.str());
 
+                m_removed_members.push_back(*m_poll_target);
                 m_members.erase(*m_poll_target);
             }
 
@@ -119,6 +142,7 @@ void Member::tick()
             m_poll_target = iter->first;
 
             PingMessage ping{m_id, iter->first};
+            ping.members_to_delete = m_removed_members;
             m_message_env.register_message(ping);
         } else if (m_poll_target && !m_req_sent ) {
             auto members = m_members;
@@ -127,6 +151,7 @@ void Member::tick()
             m_additional_poll_targets.push_back(iter->first);
 
             PingReqMessage msg_first{m_id, iter->first, *m_poll_target};
+            msg_first.members_to_delete = m_removed_members;
             m_message_env.register_message(msg_first);
 
             members.erase(iter->first);
@@ -134,6 +159,7 @@ void Member::tick()
             m_additional_poll_targets.push_back(iter->first);
 
             PingReqMessage msg_second{m_id, iter->first, *m_poll_target};
+            msg_second.members_to_delete = m_removed_members;
             m_message_env.register_message(msg_second);
 
             m_req_sent = true;

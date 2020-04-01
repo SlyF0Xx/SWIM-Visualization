@@ -45,6 +45,8 @@ public:
     { return m_logs; }
 
 private:
+    void apply_removed_members(const BaseMessage & message);
+
     int m_id;
     bool m_alive = true;
 
@@ -59,6 +61,7 @@ private:
     std::optional<int> m_poll_target = std::nullopt;
     std::vector<int> m_additional_poll_targets;
 
+    std::vector<int> m_removed_members;
     bool m_req_sent = false;
 
     static std::chrono::seconds s_period;

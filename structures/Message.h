@@ -18,6 +18,8 @@ struct BaseMessage {
     int from;
     int to;
 
+    std::vector<int> members_to_delete;
+
     static int s_id_counter;
 };
 

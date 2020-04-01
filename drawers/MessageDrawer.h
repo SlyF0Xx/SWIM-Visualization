@@ -9,10 +9,13 @@
 #include <QtWidgets/QWidget>
 
 class MemberDrawer2;
+class MainWidget;
 
 class MessageDrawer : public QWidget {
 public:
-    MessageDrawer(const Message & message, int x, int y, int dest_x, int dest_y, QWidget * parent);
+    MessageDrawer(const Message & message, int x, int y, int dest_x, int dest_y, MainWidget * parent);
+
+    Member & get_member(int id);
 
     void paintEvent(QPaintEvent *);
 private:

@@ -95,8 +95,8 @@ void MemberDrawer2::showDetails()
 
     QListWidget * members_list = details.findChild<QListWidget *>("members");
 
-    for (auto & member : m_member.get_members()) {
-        members_list->addItem(QString::number(member.get().get_id()));
+    for (auto & [id, member] : m_member.get_members()) {
+        members_list->addItem(QString::number(id));
     }
 
     QListWidget * logs_list = details.findChild<QListWidget *>("logs");

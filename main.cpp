@@ -16,6 +16,7 @@
 #include <cmath>
 #include <math.h>
 #include <QtWidgets/QLayout>
+#include <drawers/Details.h>
 
 int main(int argc, char **argv)
 {
@@ -41,10 +42,10 @@ int main(int argc, char **argv)
     const double angle = 2.0 * M_PI / count;
 
     for (auto & [id, member] : members) {
-        std::vector<std::reference_wrapper<Member>> member_ref_wrappers;
+        std::map<int, std::reference_wrapper<Member>> member_ref_wrappers;
         for (auto & [cpy_id, cpy_member] : members) {
             if (id != cpy_id) {
-                member_ref_wrappers.push_back(*cpy_member);
+                member_ref_wrappers.emplace(cpy_id, *cpy_member);
             }
         }
 

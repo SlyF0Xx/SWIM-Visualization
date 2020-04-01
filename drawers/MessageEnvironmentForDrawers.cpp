@@ -18,18 +18,18 @@ void MessageEnvironmentForDrawers::register_message(const Message & message)
     if(std::holds_alternative<PingMessage>(message)) {
         const PingMessage & msg = std::get<PingMessage>(message);
         msg_id = msg.id;
-        member_from_id = msg.from.get_id();
-        member_to_id   = msg.to.get_id();
+        member_from_id = msg.from;
+        member_to_id   = msg.to;
     } else if(std::holds_alternative<AckMessage>(message)) {
         const AckMessage & msg = std::get<AckMessage>(message);
         msg_id = msg.id;
-        member_from_id = msg.from.get_id();
-        member_to_id   = msg.to.get_id();
+        member_from_id = msg.from;
+        member_to_id   = msg.to;
     } else if(std::holds_alternative<PingReqMessage>(message)) {
         const PingReqMessage & msg = std::get<PingReqMessage>(message);
         msg_id = msg.id;
-        member_from_id = msg.from.get_id();
-        member_to_id   = msg.to.get_id();
+        member_from_id = msg.from;
+        member_to_id   = msg.to;
     }
 
     auto it_to = m_parent->get_member_drawers().find(member_to_id);

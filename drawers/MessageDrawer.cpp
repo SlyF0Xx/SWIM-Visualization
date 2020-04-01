@@ -3,6 +3,7 @@
 //
 
 #include "MessageDrawer.h"
+#include "MainWidget.h"
 
 #include "MemberDrawer2.h"
 
@@ -11,7 +12,7 @@
 
 int MessageDrawer::s_steps_count = 30;
 
-MessageDrawer::MessageDrawer(const Message & message, int x, int y, int dest_x, int dest_y, QWidget * parent)
+MessageDrawer::MessageDrawer(const Message & message, int x, int y, int dest_x, int dest_y, MainWidget * parent)
     : QWidget(parent), m_x(x), m_y(y), m_message(message)
 {
     resize(parent->width(), parent->height());
@@ -37,6 +38,11 @@ MessageDrawer::MessageDrawer(const Message & message, int x, int y, int dest_x, 
     timer->start(100);
 }
 
+Member & MessageDrawer::get_member(int id)
+{
+    return static_cast<MainWidget *>(parentWidget())->get_member_drawers().find(id)->second.get().get_member();
+}
+
 void MessageDrawer::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -52,13 +58,13 @@ void MessageDrawer::paintEvent(QPaintEvent *)
     if (m_step++ >= MessageDrawer::s_steps_count) {
         if(std::holds_alternative<PingMessage>(m_message)) {
             const PingMessage & msg = std::get<PingMessage>(m_message);
-            msg.to.handle_ping(msg);
+            get_member(msg.to).handle_ping(msg);
         } else if(std::holds_alternative<AckMessage>(m_message)) {
             const AckMessage & msg = std::get<AckMessage>(m_message);
-            msg.to.handle_ack(msg);
+            get_member(msg.to).handle_ack(msg);
         } else if(std::holds_alternative<PingReqMessage>(m_message)) {
             const PingReqMessage & msg = std::get<PingReqMessage>(m_message);
-            msg.to.handle_ping_req(msg);
+            get_member(msg.to).handle_ping_req(msg);
         }
         // notify member, delete this
     } else {

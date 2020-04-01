@@ -9,7 +9,7 @@
 #include "ITimer.h"
 
 #include <chrono>
-#include <vector>
+#include <map>
 #include <functional>
 #include <memory>
 
@@ -28,8 +28,11 @@ public:
 
     void tick();
 
+    const std::map<int, std::reference_wrapper<Member>> & get_members()
+    { return m_members; }
+
     //Because we don't implement membership
-    void set_members(const std::vector<std::reference_wrapper<Member>> & members)
+    void set_members(const std::map<int, std::reference_wrapper<Member>> & members)
     { m_members = members; }
 
     bool is_alive()
@@ -38,24 +41,30 @@ public:
     void set_alive(bool alive)
     { m_alive = alive; }
 
+    std::vector<std::string> get_logs()
+    { return m_logs; }
+
 private:
     int m_id;
     bool m_alive = true;
 
     std::chrono::system_clock::time_point m_last_poll_time;
 
-    std::vector<std::reference_wrapper<Member>> m_members;
+    std::map<int, std::reference_wrapper<Member>> m_members;
 
     IMessageEnvironment & m_message_env;
 
     ITimer & m_timer;
 
-    std::optional<std::vector<std::reference_wrapper<Member>>::iterator> m_poll_target;
-    std::vector<std::reference_wrapper<Member>> m_additional_poll_targets;
+    std::optional<int> m_poll_target = std::nullopt;
+    std::vector<int> m_additional_poll_targets;
+
     bool m_req_sent = false;
 
     static std::chrono::seconds s_period;
     static std::chrono::seconds s_invalidation_period;
+
+    std::vector<std::string> m_logs;
 };
 
 

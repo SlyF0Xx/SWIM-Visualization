@@ -18,8 +18,8 @@ find_package (Qt5Declarative)
 
 
 
-#add_executable(Visualization main.cpp structures/Member.cpp structures/Member.h drawers/MemberDrawer2.cpp drawers/MemberDrawer2.h drawers/MainWidget.cpp drawers/MainWidget.h structures/Message.cpp structures/Message.h drawers/MessageDrawer.cpp drawers/MessageDrawer.h structures/IMessageEnvironment.h drawers/MessageEnvironmentForDrawers.cpp drawers/MessageEnvironmentForDrawers.h structures/ITimer.h drawers/VisualTimer.cpp drawers/VisualTimer.h drawers/Details.h drawers/Details.cpp)
-add_executable(Visualization main.cpp structures/Member.cpp structures/Member.h drawers/MemberDrawer2.cpp drawers/MemberDrawer2.h drawers/MainWidget.cpp drawers/MainWidget.h structures/Message.cpp structures/Message.h drawers/MessageDrawer.cpp drawers/MessageDrawer.h structures/IMessageEnvironment.h drawers/MessageEnvironmentForDrawers.cpp drawers/MessageEnvironmentForDrawers.h structures/ITimer.h drawers/VisualTimer.cpp drawers/VisualTimer.h)
+add_executable(Visualization main.cpp structures/Member.cpp structures/Member.h drawers/MemberDrawer2.cpp drawers/MemberDrawer2.h drawers/MainWidget.cpp drawers/MainWidget.h structures/Message.cpp structures/Message.h drawers/MessageDrawer.cpp drawers/MessageDrawer.h structures/IMessageEnvironment.h drawers/MessageEnvironmentForDrawers.cpp drawers/MessageEnvironmentForDrawers.h structures/ITimer.h drawers/VisualTimer.cpp drawers/VisualTimer.h drawers/Details.h drawers/Details.cpp)
+#add_executable(Visualization main.cpp structures/Member.cpp structures/Member.h drawers/MemberDrawer2.cpp drawers/MemberDrawer2.h drawers/MainWidget.cpp drawers/MainWidget.h structures/Message.cpp structures/Message.h drawers/MessageDrawer.cpp drawers/MessageDrawer.h structures/IMessageEnvironment.h drawers/MessageEnvironmentForDrawers.cpp drawers/MessageEnvironmentForDrawers.h structures/ITimer.h drawers/VisualTimer.cpp drawers/VisualTimer.h)
 
 #set(UI drawers/Details.ui)
 

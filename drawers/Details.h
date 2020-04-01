@@ -2,12 +2,13 @@
 #define DETAILS_H
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QDialog>
 
 namespace Ui {
 class Details;
 }
 
-class Details : public QWidget
+class Details : public QDialog
 {
     Q_OBJECT
 

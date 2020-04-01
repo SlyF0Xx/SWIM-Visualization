@@ -4,6 +4,7 @@
 
 #include "MemberDrawer2.h"
 #include "MainWidget.h"
+#include "Details.h"
 //#include "Details.h"
 
 #include <QBrush>
@@ -16,6 +17,7 @@
 #include <QtGui/QTextItem>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QListWidget>
 
 MemberDrawer2::MemberDrawer2(Member & member, int x, int y, MainWidget * parent) :
     QWidget(parent), m_x(x), m_y(y), m_member(member)
@@ -84,6 +86,26 @@ void MemberDrawer2::ShowContextMenu(const QPoint &pos)
 
 void MemberDrawer2::showDetails()
 {
+    Details details;
+    QLabel * id_label = details.findChild<QLabel *>("id");
+    id_label->setText(QString::number(m_member.get_id()));
+
+    QLabel * state_label = details.findChild<QLabel *>("state");
+    state_label->setText(m_member.is_alive() ? "alive" : "dead");
+
+    QListWidget * members_list = details.findChild<QListWidget *>("members");
+
+    for (auto & member : m_member.get_members()) {
+        members_list->addItem(QString::number(member.get().get_id()));
+    }
+
+    QListWidget * logs_list = details.findChild<QListWidget *>("logs");
+
+    for (auto & log: m_member.get_logs()) {
+        logs_list->addItem(QString::fromStdString(log));
+    }
+
+    details.exec();
     //Details * details = findChild<Details *>("details");
     //details->show();
     /*

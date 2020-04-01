@@ -2,7 +2,7 @@
 #include "ui_Details.h"
 
 Details::Details(QWidget *parent) :
-    QWidget(parent),
+    QDialog(parent),
     ui(new Ui::Details)
 {
     ui->setupUi(this);

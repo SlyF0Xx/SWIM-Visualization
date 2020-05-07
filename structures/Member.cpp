@@ -41,8 +41,8 @@ std::ostream &operator<<(std::ostream &stream,
 
 } // unnamed namespace
 
-std::chrono::seconds Member::s_period = std::chrono::seconds(7);
-std::chrono::seconds Member::s_invalidation_period = std::chrono::seconds(30);
+std::chrono::seconds Member::s_period = std::chrono::seconds(8);
+std::chrono::seconds Member::s_invalidation_period = std::chrono::seconds(28);
 
 Member::Member(int id, IMessageEnvironment & message_env, ITimer & timer) :
     m_id(id),
@@ -110,6 +110,17 @@ void Member::handle_ping_req(const PingReqMessage & msg)
     m_message_env.unregister_message(msg.id);
 }
 
+void Member::stop()
+{
+    m_last_stop_time = std::chrono::system_clock::now();
+    m_stopped = true;
+}
+
+void Member::start()
+{
+    m_stopped = false;
+}
+
 void Member::run()
 {
     m_timer.schedule_periodically([this](){
@@ -121,6 +132,13 @@ void Member::tick()
 {
     if (!m_alive) {
         return;
+    }
+
+    if (m_stopped) {
+        auto now = std::chrono::system_clock::now();
+        auto delta = now - m_last_stop_time;
+        m_last_stop_time = now;
+        m_last_poll_time += delta;
     }
 
     if (auto now = std::chrono::system_clock::now(); now > m_last_poll_time + s_period) {
@@ -139,6 +157,10 @@ void Member::tick()
             }
 
             auto iter = select_randomly(m_members.begin(), m_members.end());
+            /*
+            auto iter = m_members.begin();
+            std::advance(iter, 4);
+            */
             m_poll_target = iter->first;
 
             PingMessage ping{m_id, iter->first};
@@ -148,6 +170,10 @@ void Member::tick()
             auto members = m_members;
             members.erase(*m_poll_target);
             auto iter = select_randomly(members.begin(), members.end());
+            /*
+            auto iter = members.begin();
+            std::advance(iter, 2);
+            */
             m_additional_poll_targets.push_back(iter->first);
 
             PingReqMessage msg_first{m_id, iter->first, *m_poll_target};
@@ -156,7 +182,11 @@ void Member::tick()
 
             members.erase(iter->first);
             iter = select_randomly(members.begin(), members.end());
-            m_additional_poll_targets.push_back(iter->first);
+            /*
+            iter = members.begin();
+            std::advance(iter, 4);
+            */
+             m_additional_poll_targets.push_back(iter->first);
 
             PingReqMessage msg_second{m_id, iter->first, *m_poll_target};
             msg_second.members_to_delete = m_removed_members;

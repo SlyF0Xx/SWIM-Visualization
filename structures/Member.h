@@ -31,6 +31,9 @@ public:
     const std::map<int, std::reference_wrapper<Member>> & get_members()
     { return m_members; }
 
+    const std::vector<int> & get_removed_members()
+    { return m_removed_members; }
+
     //Because we don't implement membership
     void set_members(const std::map<int, std::reference_wrapper<Member>> & members)
     { m_members = members; }
@@ -43,6 +46,9 @@ public:
 
     std::vector<std::string> get_logs()
     { return m_logs; }
+
+    void stop();
+    void start();
 
 private:
     void apply_removed_members(const BaseMessage & message);
@@ -68,6 +74,9 @@ private:
     static std::chrono::seconds s_invalidation_period;
 
     std::vector<std::string> m_logs;
+
+    std::chrono::system_clock::time_point m_last_stop_time;
+    bool m_stopped = false;
 };
 
 

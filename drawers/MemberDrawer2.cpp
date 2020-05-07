@@ -24,6 +24,8 @@ MemberDrawer2::MemberDrawer2(Member & member, int x, int y, MainWidget * parent)
 {
     move(x, y);
     resize(40, 40);
+
+    setObjectName("member_" + QString::number(m_member.get_id()));
     //resize(parent->width(), parent->height());
     parent->add_member_drawer(m_member.get_id(), *this);
 
@@ -36,29 +38,12 @@ MemberDrawer2::MemberDrawer2(Member & member, int x, int y, MainWidget * parent)
 
     //connect(this, &MemberDrawer2::customContextMenuRequested,
     //        this, &MemberDrawer2::ShowContextMenu);
-
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MemberDrawer2::update));
-    //timer->start(Member::s_period);
-    timer->start(7000);
-
-    /*
-    Details * details = new Details(this);
-    details->setObjectName("details");
-    details->show();
-     */
 }
+
 /*
 MemberDrawer2::~MemberDrawer2()
 {
     static_cast<MainWidget*>(parentWidget())->remove_member_drawer(m_member.get_id());
-}
-*/
-/*
-void MemberDrawer2::contextMenuEvent(QContextMenuEvent *event)
-{
-    QMenu contextMenu(tr("Context menu"), this);
 }
 */
 
@@ -80,8 +65,31 @@ void MemberDrawer2::ShowContextMenu(const QPoint &pos)
     connect(&action2, SIGNAL(triggered()), this, SLOT(showDetails()));
     contextMenu.addAction(&action2);
 
+
+    QAction action3("", this);
+    if (auto selected_member = static_cast<MainWidget *>(parentWidget())->get_selected_member();
+        selected_member && *selected_member == m_member.get_id()) {
+
+        action3.setText("Deselect");
+        connect(&action3, SIGNAL(triggered()), this, SLOT(deselect()));
+    } else {
+        action3.setText("Select");
+        connect(&action3, SIGNAL(triggered()), this, SLOT(select()));
+    }
+    contextMenu.addAction(&action3);
+
     contextMenu.exec(pos);
     //contextMenu.exec(mapToGlobal(pos));
+}
+
+void MemberDrawer2::select()
+{
+    static_cast<MainWidget *>(parentWidget())->set_selected_member(m_member.get_id());
+}
+
+void MemberDrawer2::deselect()
+{
+    static_cast<MainWidget *>(parentWidget())->set_selected_member(std::nullopt);
 }
 
 void MemberDrawer2::showDetails()
@@ -106,19 +114,6 @@ void MemberDrawer2::showDetails()
     }
 
     details.exec();
-    //Details * details = findChild<Details *>("details");
-    //details->show();
-    /*
-    QWidget * details = new QWidget;
-    QGridLayout * layout = new QGridLayout(details);
-
-    QLabel * id_name = new QLabel("id");
-    layout->addWidget(id_name, 0, 0);
-
-    QLabel * id = new QLabel(QString::number(m_member.get_id()));
-    layout->addWidget(id, 0, 1);
-    details->show();
-    */
 }
 
 void MemberDrawer2::setAlive()
@@ -142,6 +137,11 @@ void MemberDrawer2::paintEvent(QPaintEvent *)
 
     if (!m_member.is_alive()) {
         QBrush brush(Qt::red);
+        painter.setBrush(brush);
+    }
+
+    if (!m_member.get_removed_members().empty()) {
+        QBrush brush(Qt::black);
         painter.setBrush(brush);
     }
 

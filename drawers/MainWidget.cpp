@@ -4,15 +4,65 @@
 
 #include "MainWidget.h"
 
+#include <QRegularExpression>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QPushButton>
 
-MainWidget::MainWidget()
+MainWidget::MainWidget(int size)
 {
+    resize(size, size);
     setContextMenuPolicy(Qt::CustomContextMenu);
 
     connect(this, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(ShowContextMenu(QPoint)));
+
+    QPushButton * stop_button = new QPushButton("stop", this);
+    stop_button->setObjectName("stop");
+    stop_button->move(frameGeometry().width() - 150, frameGeometry().height() - 50);
+    connect(stop_button, SIGNAL(clicked()),
+            this, SLOT(stop()));
+
+    QPushButton * start_button = new QPushButton("start", this);
+    start_button->setObjectName("start");
+    start_button->move(frameGeometry().width() - 250, frameGeometry().height() - 50);
+    start_button->setEnabled(false);
+    connect(start_button, SIGNAL(clicked()),
+            this, SLOT(start()));
+}
+
+void MainWidget::stop()
+{
+    for (auto & message_drawer : findChildren<MessageDrawer *>(QRegularExpression("message_*"))) {
+        message_drawer->setEnabled(false);
+    }
+
+    for (auto & member_drawer : findChildren<MemberDrawer2 *>(QRegularExpression("member_*"))) {
+        member_drawer->get_member().stop();
+    }
+
+    QPushButton * stop_button = findChild<QPushButton *>("stop");
+    QPushButton * start_button = findChild<QPushButton *>("start");
+
+    stop_button->setEnabled(false);
+    start_button->setEnabled(true);
+}
+
+void MainWidget::start()
+{
+    for (auto & message_drawer : findChildren<MessageDrawer *>(QRegularExpression("message_*"))) {
+        message_drawer->setEnabled(true);
+    }
+
+    for (auto & member_drawer : findChildren<MemberDrawer2 *>(QRegularExpression("member_*"))) {
+        member_drawer->get_member().start();
+    }
+
+    QPushButton * stop_button = findChild<QPushButton *>("stop");
+    QPushButton * start_button = findChild<QPushButton *>("start");
+
+    stop_button->setEnabled(true);
+    start_button->setEnabled(false);
 }
 
 void MainWidget::ShowContextMenu(const QPoint &pos)

@@ -17,6 +17,9 @@ public:
 
     Member & get_member(int id);
 
+    void setEnabled(bool enabled)
+    { m_enabled = enabled; }
+
     void paintEvent(QPaintEvent *);
 private:
     double m_x, m_y;
@@ -27,5 +30,7 @@ private:
     static int s_steps_count;
 
     const Message & m_message;
+
+    bool m_enabled = true;
 };
 

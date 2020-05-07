@@ -47,7 +47,7 @@ void MessageEnvironmentForDrawers::register_message(const Message & message)
 
 void MessageEnvironmentForDrawers::unregister_message(int id)
 {
-    MessageDrawer * child = m_parent->findChild<MessageDrawer *>(QString::number(id));
+    MessageDrawer * child = m_parent->findChild<MessageDrawer *>("message_" + QString::number(id));
     child->hide();
     child->close();
     child->deleteLater();

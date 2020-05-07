@@ -36,6 +36,10 @@ public Q_SLOTS:
     void setAlive();
     void setDead();
 
+    void select();
+    void deselect();
+
+
 private:
     int m_x, m_y;
     Member & m_member;

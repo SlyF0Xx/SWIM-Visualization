@@ -21,8 +21,8 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    MainWidget window;
-    window.resize(400, 400);
+    int size = 800;
+    MainWidget window(size);
     window.setWindowTitle
             (QApplication::translate("childwidget", "Child widget"));
     window.show();
@@ -31,14 +31,14 @@ int main(int argc, char **argv)
 
     std::map<int, std::unique_ptr<Member>> members;
 
-    const int count = 10;
+    const int count = 8;
     for (int i = 0; i < count; ++i) {
         VisualTimer * timer = new VisualTimer(&window);
 
         members.emplace(i, std::make_unique<Member>(i, message_env, *timer));
     }
 
-    const int radius = 100;
+    const int radius = 300;
     const double angle = 2.0 * M_PI / count;
 
     for (auto & [id, member] : members) {

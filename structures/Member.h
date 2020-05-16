@@ -57,6 +57,7 @@ private:
     bool m_alive = true;
 
     std::chrono::system_clock::time_point m_last_poll_time;
+    std::chrono::nanoseconds m_delta;
 
     std::map<int, std::reference_wrapper<Member>> m_members;
 
@@ -70,12 +71,11 @@ private:
     std::vector<int> m_removed_members;
     bool m_req_sent = false;
 
-    static std::chrono::seconds s_period;
-    static std::chrono::seconds s_invalidation_period;
+    static std::chrono::nanoseconds s_period;
+    static std::chrono::nanoseconds s_invalidation_period;
 
     std::vector<std::string> m_logs;
 
-    std::chrono::system_clock::time_point m_last_stop_time;
     bool m_stopped = false;
 };
 

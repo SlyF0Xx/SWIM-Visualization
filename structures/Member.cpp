@@ -41,8 +41,8 @@ std::ostream &operator<<(std::ostream &stream,
 
 } // unnamed namespace
 
-std::chrono::seconds Member::s_period = std::chrono::seconds(8);
-std::chrono::seconds Member::s_invalidation_period = std::chrono::seconds(28);
+std::chrono::nanoseconds Member::s_period = std::chrono::milliseconds(9000);
+std::chrono::nanoseconds Member::s_invalidation_period = std::chrono::milliseconds(30000);
 
 Member::Member(int id, IMessageEnvironment & message_env, ITimer & timer) :
     m_id(id),
@@ -82,9 +82,13 @@ void Member::handle_ack(const AckMessage & msg)
         apply_removed_members(msg);
 
         if (msg.target) {
-            AckMessage ack{m_id, *msg.target};
-            ack.members_to_delete = m_removed_members;
-            m_message_env.register_message(ack);
+            if (msg.target == *m_poll_target) {
+                m_poll_target = std::nullopt;
+            } else {
+                AckMessage ack{m_id, *msg.target, msg.from};
+                ack.members_to_delete = m_removed_members;
+                m_message_env.register_message(ack);
+            }
         } else {
             if (m_poll_target) {
                 if (msg.from == *m_poll_target) {
@@ -112,7 +116,6 @@ void Member::handle_ping_req(const PingReqMessage & msg)
 
 void Member::stop()
 {
-    m_last_stop_time = std::chrono::system_clock::now();
     m_stopped = true;
 }
 
@@ -134,22 +137,24 @@ void Member::tick()
         return;
     }
 
-    if (m_stopped) {
+    if (!m_stopped) {
         auto now = std::chrono::system_clock::now();
-        auto delta = now - m_last_stop_time;
-        m_last_stop_time = now;
-        m_last_poll_time += delta;
+        std::chrono::nanoseconds delta = now - m_last_poll_time;
+        m_last_poll_time = now;
+        m_delta += std::chrono::nanoseconds(static_cast<long long>(delta.count() * m_timer.get_time_factor()));
+    } else {
+        m_last_poll_time = std::chrono::system_clock::now();
     }
 
-    if (auto now = std::chrono::system_clock::now(); now > m_last_poll_time + s_period) {
-        if (now > m_last_poll_time + s_invalidation_period) {
-            m_last_poll_time = now;
+    if (m_delta > s_period) {
+        if (m_delta > s_invalidation_period) {
+            m_delta = std::chrono::nanoseconds(0);
             m_additional_poll_targets.clear();
             m_req_sent = false;
 
             if (m_poll_target) {
                 std::ostringstream oss;
-                oss << now <<  std::to_string(m_id) << " find, that " << *m_poll_target << " is dead";
+                oss << std::to_string(m_id) << " find, that " << *m_poll_target << " is dead";
                 m_logs.push_back(oss.str());
 
                 m_removed_members.push_back(*m_poll_target);

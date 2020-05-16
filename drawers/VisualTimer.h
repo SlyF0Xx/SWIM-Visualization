@@ -16,5 +16,7 @@ public:
     void schedule_periodically(std::function<void()> func) override;
 
     void cancel() override;
+
+    double get_time_factor() override;
 };
 

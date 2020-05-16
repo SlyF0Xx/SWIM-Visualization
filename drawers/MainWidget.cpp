@@ -8,6 +8,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 
 MainWidget::MainWidget(int size)
 {
@@ -29,6 +30,21 @@ MainWidget::MainWidget(int size)
     start_button->setEnabled(false);
     connect(start_button, SIGNAL(clicked()),
             this, SLOT(start()));
+
+    QSlider * slider = new QSlider(Qt::Horizontal, this);
+    slider->setObjectName("time_factor_slider");
+    slider->move(frameGeometry().width() - 400, frameGeometry().height() - 50);
+    slider->setMaximum(100);
+    slider->setMinimum(1);
+    connect(slider, &QSlider::valueChanged, this, &MainWidget::set_time_factor);
+}
+
+void MainWidget::set_time_factor(int value)
+{
+    m_time_factor = 10.0 / value;
+    for (auto & message_drawer : findChildren<MessageDrawer *>(QRegularExpression("message_*"))) {
+        message_drawer->change_time_factor(m_time_factor);
+    }
 }
 
 void MainWidget::stop()

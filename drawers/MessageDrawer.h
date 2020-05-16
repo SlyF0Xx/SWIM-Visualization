@@ -21,6 +21,9 @@ public:
     { m_enabled = enabled; }
 
     void paintEvent(QPaintEvent *);
+
+    void change_time_factor(double value);
+
 private:
     double m_x, m_y;
 

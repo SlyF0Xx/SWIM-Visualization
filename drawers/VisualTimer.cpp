@@ -3,6 +3,7 @@
 //
 
 #include "VisualTimer.h"
+#include "MainWidget.h"
 
 VisualTimer::VisualTimer(QObject * parent)
     : QTimer(parent)
@@ -19,4 +20,9 @@ void VisualTimer::schedule_periodically(std::function<void()> func)
 void VisualTimer::cancel()
 {
     stop();
+}
+
+double VisualTimer::get_time_factor()
+{
+    return static_cast<MainWidget *>(parent())->get_time_factor();
 }

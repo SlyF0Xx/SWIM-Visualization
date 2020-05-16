@@ -2,6 +2,7 @@
 // Created by slyfox on 28.03.20.
 //
 
+#include "MessageEnvironmentForDrawers.h"
 #include "MessageDrawer.h"
 #include "MainWidget.h"
 
@@ -44,8 +45,15 @@ MessageDrawer::MessageDrawer(const Message & message, int x, int y, int dest_x, 
     m_step_y = (dest_y - m_y) / static_cast<double>(MessageDrawer::s_steps_count);
 
     QTimer *timer = new QTimer(this);
+    timer->setObjectName("timer");
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MessageDrawer::update));
-    timer->start(40);
+    timer->start(40 / parent->get_time_factor());
+}
+
+void MessageDrawer::change_time_factor(double value)
+{
+    QTimer * timer = findChild<QTimer *>("timer");
+    timer->start(40 / value);
 }
 
 Member & MessageDrawer::get_member(int id)

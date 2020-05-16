@@ -10,6 +10,8 @@
 
 #include <functional>
 
+class MessageEnvironmentForDrawers;
+
 class MainWidget : public QWidget {
 Q_OBJECT
 public:
@@ -30,12 +32,21 @@ public:
     void set_selected_member(const std::optional<int> & selected_member)
     { m_selected_member = selected_member; }
 
+    double get_time_factor()
+    { return m_time_factor; }
+
+    void set_env(MessageEnvironmentForDrawers * env)
+    { m_env = env; }
+
 public Q_SLOTS:
     void ShowContextMenu(const QPoint &pos);
     void stop();
     void start();
+    void set_time_factor(int value);
 
 private:
     std::map<int, std::reference_wrapper<MemberDrawer2>> m_member_drawers;
     std::optional<int> m_selected_member;
+    double m_time_factor = 3.0;
+    MessageEnvironmentForDrawers * m_env;
 };

@@ -10,6 +10,8 @@ class ITimer {
 public:
     virtual void schedule_periodically(std::function<void()> func) = 0;
     virtual void cancel() = 0;
+
+    virtual double get_time_factor() = 0;
 };
 
 

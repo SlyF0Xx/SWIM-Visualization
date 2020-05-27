@@ -7,6 +7,7 @@
 #include "Message.h"
 #include "IMessageEnvironment.h"
 #include "ITimer.h"
+#include "IMemberEnvironment.h"
 
 #include <chrono>
 #include <map>
@@ -15,7 +16,7 @@
 
 class Member {
 public:
-    Member(int id, IMessageEnvironment & message_env, ITimer & timer);
+    Member(int id, IMessageEnvironment & message_env, IMemberEnvironment & member_env, ITimer & timer);
 
     int get_id() const
     { return m_id; }
@@ -53,6 +54,11 @@ public:
 private:
     void apply_removed_members(const BaseMessage & message);
 
+    bool roll_alive();
+    bool roll_dead();
+    bool roll();
+    void change_state();
+
     int m_id;
     bool m_alive = true;
 
@@ -62,6 +68,7 @@ private:
     std::map<int, std::reference_wrapper<Member>> m_members;
 
     IMessageEnvironment & m_message_env;
+    IMemberEnvironment & m_member_env;
 
     ITimer & m_timer;
 

@@ -9,6 +9,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QSpinBox>
 
 MainWidget::MainWidget(int size)
 {
@@ -32,12 +33,29 @@ MainWidget::MainWidget(int size)
             this, SLOT(start()));
 
     QSlider * slider = new QSlider(Qt::Horizontal, this);
-    slider->setObjectName("time_factor_slider");
     slider->move(frameGeometry().width() - 400, frameGeometry().height() - 50);
     slider->setMaximum(100);
     slider->setMinimum(1);
     connect(slider, &QSlider::valueChanged, this, &MainWidget::set_time_factor);
+
+    QSpinBox * die_probability = new QSpinBox(this);
+    die_probability->move(frameGeometry().width() - 150, frameGeometry().height() - 100);
+    die_probability->setMaximum(100);
+    die_probability->setMinimum(1);
+    connect(die_probability, qOverload<int>(&QSpinBox::valueChanged), this, &MainWidget::set_die_probability);
+
+    QSpinBox * recover_probability = new QSpinBox(this);
+    recover_probability->move(frameGeometry().width() - 150, frameGeometry().height() - 150);
+    recover_probability->setMaximum(100);
+    recover_probability->setMinimum(1);
+    connect(recover_probability, qOverload<int>(&QSpinBox::valueChanged), this, &MainWidget::set_recover_probability);
 }
+
+void MainWidget::set_die_probability(int percent)
+{ m_die_probability = 0.01 * percent; }
+
+void MainWidget::set_recover_probability(int percent)
+{ m_recover_probability = 0.01 * percent; }
 
 void MainWidget::set_time_factor(int value)
 {

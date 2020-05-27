@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < count; ++i) {
         VisualTimer * timer = new VisualTimer(&window);
 
-        members.emplace(i, std::make_unique<Member>(i, message_env, *timer));
+        members.emplace(i, std::make_unique<Member>(i, message_env, window, *timer));
     }
 
     const int radius = 300;

@@ -44,9 +44,10 @@ std::ostream &operator<<(std::ostream &stream,
 std::chrono::nanoseconds Member::s_period = std::chrono::milliseconds(9000);
 std::chrono::nanoseconds Member::s_invalidation_period = std::chrono::milliseconds(30000);
 
-Member::Member(int id, IMessageEnvironment & message_env, ITimer & timer) :
+Member::Member(int id, IMessageEnvironment & message_env, IMemberEnvironment & member_env, ITimer & timer) :
     m_id(id),
     m_message_env(message_env),
+    m_member_env(member_env),
     m_timer(timer)
 {}
 
@@ -131,8 +132,26 @@ void Member::run()
     });
 }
 
+bool Member::roll()
+{
+    if (m_alive) {
+        return m_member_env.roll_to_die();
+    } else {
+        return m_member_env.roll_to_recover();
+    };
+}
+
+void Member::change_state()
+{
+    m_alive = !m_alive;
+}
+
 void Member::tick()
 {
+    if (roll()) {
+        change_state();
+    }
+
     if (!m_alive) {
         return;
     }

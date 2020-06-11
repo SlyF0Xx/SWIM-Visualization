@@ -59,6 +59,12 @@ private:
     bool roll();
     void change_state();
 
+    void recalculate_time_delta();
+
+    void invalidate_member();
+    void on_new_period();
+    void send_ping_request();
+
     int m_id;
     bool m_alive = true;
 

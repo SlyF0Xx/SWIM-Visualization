@@ -12,6 +12,8 @@
 #include <QGraphicsView>
 #include <QVector>
 
+#define _USE_MATH_DEFINES
+
 #include <vector>
 #include <cmath>
 #include <math.h>
@@ -21,8 +23,7 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    int size = 800;
-    MainWidget window(size);
+    MainWidget window;
     window.setWindowTitle
             (QApplication::translate("childwidget", "Child widget"));
     window.show();
@@ -31,7 +32,7 @@ int main(int argc, char **argv)
 
     std::map<int, std::unique_ptr<Member>> members;
 
-    const int count = 8;
+    const int count = 5;
     for (int i = 0; i < count; ++i) {
         VisualTimer * timer = new VisualTimer(&window);
 

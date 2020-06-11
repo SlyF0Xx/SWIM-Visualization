@@ -7,17 +7,21 @@
 #include "MemberDrawer2.h"
 #include <structures/IMemberEnvironment.h>
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QMainWindow>
 
 #include <functional>
 
 class MessageEnvironmentForDrawers;
 
-class MainWidget : public QWidget,
+namespace Ui {
+class MainWidget;
+}
+
+class MainWidget : public QMainWindow,
                    public IMemberEnvironment {
 Q_OBJECT
 public:
-    MainWidget(int size);
+    MainWidget();
 
     void add_member_drawer(int id, MemberDrawer2 & member_drawer)
     { m_member_drawers.emplace(id, member_drawer); }
@@ -39,14 +43,21 @@ public:
 
 public Q_SLOTS:
     void ShowContextMenu(const QPoint &pos);
-    void stop();
-    void start();
-    void set_time_factor(int value);
-    void set_die_probability(int percent);
-    void set_recover_probability(int percent);
+
+private slots:
+    void on_stop_clicked();
+    void on_start_clicked();
+
+    void on_die_probability_sliderMoved(int position);
+    void on_recover_probability_sliderMoved(int position);
+
+    void on_timespeed_sliderMoved(int position);
 
 private:
     std::map<int, std::reference_wrapper<MemberDrawer2>> m_member_drawers;
     std::optional<int> m_selected_member;
-    double m_time_factor = 3.0;
+    double m_time_factor = 5.0;
+
+private:
+    Ui::MainWidget *ui;
 };

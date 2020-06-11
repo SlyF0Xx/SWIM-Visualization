@@ -140,10 +140,12 @@ void MemberDrawer2::paintEvent(QPaintEvent *)
         painter.setBrush(brush);
     }
 
+    /*
     if (!m_member.get_removed_members().empty()) {
         QBrush brush(Qt::black);
         painter.setBrush(brush);
     }
+    */
 
     painter.drawEllipse(0, 0, 40, 40);
     //painter.drawText(m_x + 17, m_y + 25, QString::number(m_member.get_id()));

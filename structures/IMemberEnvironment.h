@@ -25,6 +25,6 @@ public:
     }
 
 protected:
-    double m_die_probability = 0.001;
-    double m_recover_probability = 0.001;
+    double m_die_probability = 0;
+    double m_recover_probability = 0;
 };
